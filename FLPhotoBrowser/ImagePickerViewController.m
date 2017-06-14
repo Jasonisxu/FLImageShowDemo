@@ -27,7 +27,7 @@
     UIView *_titleTableBackgroundView;
     UIImageView *_titleViewImageView;
     UIView *_titleView;
-
+    
     //是否是Camera Roll
     BOOL _isCameraRoll;
 }
@@ -107,7 +107,7 @@
     PHFetchResult<PHAssetCollection *> *assetCollections = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
     // 遍历所有的自定义相簿
     for (PHAssetCollection *assetCollection in assetCollections) {
-//        [self enumerateAssetsInAssetCollection:assetCollection original:YES];
+        //        [self enumerateAssetsInAssetCollection:assetCollection original:YES];
         if (assetCollection)
         {
             _titleLabel.text = assetCollection.localizedTitle;
@@ -259,7 +259,7 @@
             [self callSystemCamera];
         } else {
             NSLog(@"点击了%li",indexPath.row);
-
+            
             FLImageShowVC *fvc = [[FLImageShowVC alloc] init];
             fvc.albumImageUrlArray = _imageAssetAray;
             fvc.currentIndex = indexPath.row - 1;
@@ -412,33 +412,44 @@
 
 - (void)selectBtnClick:(UIButton *)btn
 {
-    //    btn.selected = !btn.selected;
-    //    MyCollectionViewCell *cell = (MyCollectionViewCell *)[[btn superview] superview];
-    //    NSIndexPath *indexPath = [_myCollectionView indexPathForCell:cell];
-    //    ALAsset *asset = _imageAssetAray[indexPath.row - 1];
-    //
-    //    if (btn.selected)
-    //    {
-    //        [_selectAssetArray addObject:asset];
-    //        [_selectIndexArray addObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
-    //    }
-    //    else
-    //    {
-    //        [_selectAssetArray removeObject:asset];
-    //        [_selectIndexArray removeObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
-    //    }
-    //
-    //    if (_selectAssetArray.count == 0)
-    //    {
-    //        [_okBtn setTitle:@"下一步" forState:UIControlStateNormal];
-    //    }
-    //    else
-    //    {
-    //        [_okBtn setTitle:[NSString stringWithFormat:@"下一步(%lu)",(unsigned long)[_selectAssetArray count]] forState:UIControlStateNormal];
-    //    }
-    //    NSLog(@"%@",_selectIndexArray);
-    //    NSLog(@"%@",_selectAssetArray);
-    //
+    MyCollectionViewCell *cell = (MyCollectionViewCell *)[[btn superview] superview];
+    NSIndexPath *indexPath = [_myCollectionView indexPathForCell:cell];
+    PHAsset *asset ;
+    if (_isCameraRoll) {
+        asset = _imageAssetAray[indexPath.row - 1];
+    } else {
+        asset = _imageAssetAray[indexPath.row];
+    }
+    
+    //判断是否选中
+    if (!btn.selected)
+    {
+        if (_selectAssetArray.count >= 9) {
+            [[[UIAlertView alloc] initWithTitle:@"亲，最多只能选择9张" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil] show];
+            return;
+        } else {
+            btn.selected = YES;
+            [_selectAssetArray addObject:asset];
+            [_selectIndexArray addObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
+        }
+    }
+    else
+    {
+        btn.selected = NO;
+        [_selectAssetArray removeObject:asset];
+        [_selectIndexArray removeObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
+    }
+    
+    if (_selectAssetArray.count == 0)
+    {
+        [_okBtn setTitle:@"下一步" forState:UIControlStateNormal];
+    }
+    else
+    {
+        [_okBtn setTitle:[NSString stringWithFormat:@"下一步(%lu)",(unsigned long)[_selectAssetArray count]] forState:UIControlStateNormal];
+    }
+    NSLog(@"%@",_selectIndexArray);
+    NSLog(@"%@",_selectAssetArray);
 }
 
 
