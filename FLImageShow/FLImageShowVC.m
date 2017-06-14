@@ -8,6 +8,7 @@
 
 #import "FLImageShowVC.h"
 #import "FLImageShowCell.h"
+#import <Photos/Photos.h>
 
 typedef enum : NSUInteger {
     FLImageShowTypeLocal,
@@ -25,6 +26,10 @@ typedef enum : NSUInteger {
  是否第一次进入到此界面
  */
 @property (nonatomic,assign)BOOL isFirst;
+
+@property (weak, nonatomic) IBOutlet UIButton *selectButton;
+@property (weak, nonatomic) IBOutlet UILabel *allSelectNum;
+
 @end
 
 @implementation FLImageShowVC
@@ -106,6 +111,8 @@ typedef enum : NSUInteger {
     [singleViewTap requireGestureRecognizerToFail:doubleViewTap];
     
     [self rotateView];
+    
+    [self addSelectNumberaction:self.onlySelectDictionary.count];
 }
 
 - (void)viewDidLayoutSubviews
@@ -229,6 +236,11 @@ typedef enum : NSUInteger {
 
 - (IBAction)topLeftBtnClick:(UIButton *)sender
 {
+    //把改变的字典返回上个页面
+    if (self.onlySelectDictionaryBlock) {
+        self.onlySelectDictionaryBlock(_onlySelectDictionary);
+    }
+
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -268,6 +280,15 @@ typedef enum : NSUInteger {
             break;
     }
     _topLabel.text = [NSString stringWithFormat:@"%ld/%ld",_currentIndex + 1, allCount];
+    
+    PHAsset *asset = _albumImageUrlArray[_currentIndex];
+    if ([_onlySelectDictionary objectForKey:asset]) {
+        [self.selectButton setImage:[UIImage imageNamed:@"ico_选中.png"] forState:UIControlStateNormal];
+        self.selectButton.tag = 1;
+    } else {
+        [self.selectButton setImage:[UIImage imageNamed:@"ico_未选中.png"] forState:UIControlStateNormal];
+        self.selectButton.tag = 0;
+    }
 }
 
 #pragma mark--UICollectionViewDataSource
@@ -329,4 +350,35 @@ typedef enum : NSUInteger {
     }
     return cell;
 }
+
+#pragma mark --选中图片的数量--
+- (void)addSelectNumberaction:(NSInteger)number {
+    self.allSelectNum.text = [NSString stringWithFormat:@"%li",number];
+}
+
+#pragma mark --选中图片按钮--
+- (IBAction)selectImageAction:(UIButton *)sender {
+    PHAsset *asset = _albumImageUrlArray[_currentIndex];
+
+    if (sender.tag == 0) {
+        if (self.onlySelectDictionary.count >= 9) {
+            [[[UIAlertView alloc] initWithTitle:@"亲，最多只能选择9张" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil] show];
+        } else {
+            [_onlySelectDictionary setObject:asset forKey:asset];
+            
+            self.selectButton.tag = 1;
+            [self.selectButton setImage:[UIImage imageNamed:@"ico_选中.png"] forState:UIControlStateNormal];
+        }
+    } else {
+        [_onlySelectDictionary removeObjectForKey:asset];
+
+        self.selectButton.tag = 0;
+        [self.selectButton setImage:[UIImage imageNamed:@"ico_未选中.png"] forState:UIControlStateNormal];
+    }
+    
+    [self addSelectNumberaction:self.onlySelectDictionary.count];
+
+}
+
+
 @end

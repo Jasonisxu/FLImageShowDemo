@@ -11,7 +11,9 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="FLImageShowVC">
             <connections>
+                <outlet property="allSelectNum" destination="vzd-bt-Rd4" id="C2S-0w-bld"/>
                 <outlet property="myCollectionView" destination="hfv-El-ixr" id="q0K-fM-tCy"/>
+                <outlet property="selectButton" destination="gDm-Mw-AwT" id="2Hn-xc-2EO"/>
                 <outlet property="topLabel" destination="4b8-5I-f8T" id="qei-om-YVf"/>
                 <outlet property="topView" destination="Iw2-aA-IRG" id="jOA-gP-fbR"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
@@ -40,7 +42,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="375" height="64"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EG8-7Z-uB9">
-                            <rect key="frame" x="0.0" y="0.0" width="30" height="64"/>
+                            <rect key="frame" x="0.0" y="0.0" width="60" height="64"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <state key="normal" image="ico_选中.png"/>
                             <connections>
@@ -54,6 +56,14 @@
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
+                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gDm-Mw-AwT">
+                            <rect key="frame" x="325" y="19" width="30" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" image="ico_未选中.png"/>
+                            <connections>
+                                <action selector="selectImageAction:" destination="-1" eventType="touchUpInside" id="lkL-ps-WrA"/>
+                            </connections>
+                        </button>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
@@ -72,7 +82,7 @@
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="10" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vzd-bt-Rd4">
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vzd-bt-Rd4">
                             <rect key="frame" x="306" y="13" width="24" height="24"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" red="0.81960784310000001" green="0.0" blue="0.074509803920000006" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -107,6 +117,7 @@
         </view>
     </objects>
     <resources>
-        <image name="ico_选中.png" width="15" height="15"/>
+        <image name="ico_未选中.png" width="50" height="50"/>
+        <image name="ico_选中.png" width="50" height="50"/>
     </resources>
 </document>

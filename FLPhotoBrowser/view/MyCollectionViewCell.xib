@@ -22,10 +22,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                     </imageView>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ucg-Yd-Yaf">
-                        <rect key="frame" x="20" y="-10" width="40" height="40"/>
+                        <rect key="frame" x="30" y="0.0" width="24" height="24"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="40" id="O4H-K1-951"/>
-                            <constraint firstAttribute="height" constant="40" id="XEj-6e-aSp"/>
+                            <constraint firstAttribute="width" constant="24" id="O4H-K1-951"/>
+                            <constraint firstAttribute="height" constant="24" id="XEj-6e-aSp"/>
                         </constraints>
                         <state key="normal" image="ico_未选中">
                             <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -36,9 +36,9 @@
             </view>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="Zaz-cF-HLr" secondAttribute="trailing" id="4YL-uB-QbJ"/>
-                <constraint firstItem="Ucg-Yd-Yaf" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="-10" id="EZu-of-x1z"/>
+                <constraint firstItem="Ucg-Yd-Yaf" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="EZu-of-x1z"/>
                 <constraint firstItem="Zaz-cF-HLr" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="HIs-NB-kYg"/>
-                <constraint firstAttribute="trailing" secondItem="Ucg-Yd-Yaf" secondAttribute="trailing" constant="-10" id="Jkd-ps-TfG"/>
+                <constraint firstAttribute="trailing" secondItem="Ucg-Yd-Yaf" secondAttribute="trailing" constant="-4" id="Jkd-ps-TfG"/>
                 <constraint firstAttribute="bottom" secondItem="Zaz-cF-HLr" secondAttribute="bottom" id="OCv-wb-5Q8"/>
                 <constraint firstItem="Zaz-cF-HLr" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="hDu-bC-nar"/>
             </constraints>

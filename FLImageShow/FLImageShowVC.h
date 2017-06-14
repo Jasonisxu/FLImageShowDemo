@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 
 @interface FLImageShowVC : UIViewController
+
+@property (nonatomic, copy) void(^onlySelectDictionaryBlock)(NSMutableDictionary *selectDictionary);
+
 /**
  *  本地图片名字数组
  */
@@ -25,4 +28,6 @@
  *  当前图片位置，值在0到数组最大值之间
  */
 @property (nonatomic,assign)NSInteger currentIndex;
+
+@property (nonatomic,strong)NSMutableDictionary *onlySelectDictionary;//只能选择9张照片的字典
 @end

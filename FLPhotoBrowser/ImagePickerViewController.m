@@ -253,19 +253,30 @@
             [self callSystemCamera];
         } else {
             NSLog(@"点击了%li",indexPath.row);
-            
-            FLImageShowVC *fvc = [[FLImageShowVC alloc] init];
-            fvc.albumImageUrlArray = _imageAssetAray;
-            fvc.currentIndex = indexPath.row - 1;
-            [self.navigationController pushViewController:fvc animated:YES];
+            [self pushFLImageShowVCAction:indexPath.row - 1];
         }
     } else {
         NSLog(@"点击了%li",indexPath.row);
-        FLImageShowVC *fvc = [[FLImageShowVC alloc] init];
-        fvc.albumImageUrlArray = _imageAssetAray;
-        fvc.currentIndex = indexPath.row;
-        [self.navigationController pushViewController:fvc animated:YES];
+        [self pushFLImageShowVCAction:indexPath.row];
+       
     }
+}
+
+#pragma mark --跳转下个页面，并且执行回调--
+- (void)pushFLImageShowVCAction:(NSInteger)index {
+    __weak __typeof(&*self)weakSelf = self;
+    
+    FLImageShowVC *fvc = [[FLImageShowVC alloc] init];
+    fvc.onlySelectDictionary = weakSelf.onlySelectDictionary;
+    fvc.albumImageUrlArray = weakSelf.imageAssetAray;
+    fvc.currentIndex = index;
+    
+    [fvc setOnlySelectDictionaryBlock:^(NSMutableDictionary *selectDictionary){
+        [weakSelf.okBtn setTitle:[NSString stringWithFormat:@"下一步(%lu)",(unsigned long)[[_onlySelectDictionary allKeys] count]] forState:UIControlStateNormal];
+        weakSelf.onlySelectDictionary = selectDictionary;
+        [weakSelf.myCollectionView reloadData];
+    }];
+    [weakSelf.navigationController pushViewController:fvc animated:YES];
 }
 
 #pragma mark --调用系统相机--
