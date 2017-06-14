@@ -10,8 +10,8 @@
 @interface ImagePickerViewController : UIViewController<UICollectionViewDataSource,UICollectionViewDelegate,UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 @property (weak, nonatomic) IBOutlet UICollectionView *myCollectionView;
 
-@property (nonatomic,strong)NSMutableArray *imageAssetAray; //照片数组
-@property (nonatomic,strong)NSMutableDictionary *selectImageDictionary;//选中照片库中，照片的个数
+@property (nonatomic,strong)NSMutableArray *imageAssetAray; //照片分类数组
+//@property (nonatomic,strong)NSMutableDictionary *selectImageDictionary;//选中照片库中，照片的个数
 @property (nonatomic,strong)NSMutableDictionary *onlySelectDictionary;//只能选择9张照片的字典
 
 @property (nonatomic,strong)NSMutableArray *imageUrlArray;

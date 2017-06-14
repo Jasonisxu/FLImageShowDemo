@@ -59,7 +59,7 @@
     self.navigationItem.rightBarButtonItem = rightBarButtonItem;
     _okBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     
-    _selectImageDictionary = [NSMutableDictionary dictionary];
+//    _selectImageDictionary = [NSMutableDictionary dictionary];
     _onlySelectDictionary = [NSMutableDictionary dictionary];
     
     
@@ -110,7 +110,7 @@
     for (PHAssetCollection *assetCollection in assetCollections) {
         if (assetCollection)
         {
-            [_selectImageDictionary setObject:[NSMutableDictionary dictionary] forKey:assetCollection.localizedTitle];
+//            [_selectImageDictionary setObject:[NSMutableDictionary dictionary] forKey:assetCollection.localizedTitle];
             
             _titleLabel.text = assetCollection.localizedTitle;
             [_groupArray insertObject:assetCollection atIndex:0];
@@ -144,7 +144,7 @@
     NSLog(@"相簿名:%@", assetCollection.localizedTitle);
     if (assetCollection)
     {
-        [_selectImageDictionary setObject:[NSMutableDictionary dictionary] forKey:assetCollection.localizedTitle];
+//        [_selectImageDictionary setObject:[NSMutableDictionary dictionary] forKey:assetCollection.localizedTitle];
 
         _titleLabel.text = assetCollection.localizedTitle;
         [_groupArray insertObject:assetCollection atIndex:0];
@@ -275,12 +275,12 @@
         [weakSelf.myCollectionView reloadData];
     }];
     
-    NSMutableDictionary *oldDic = [_selectImageDictionary objectForKey:_titleLabel.text];
-    fvc.indexPhotoDictionary = oldDic;
-    [fvc setIndexPhotoDictionaryBlock:^(NSMutableDictionary *selectDictionary){
-        [weakSelf.selectImageDictionary setObject:selectDictionary forKey:_titleLabel.text];
-        [_titleTabelView reloadData];
-    }];
+//    NSMutableDictionary *oldDic = [_selectImageDictionary objectForKey:_titleLabel.text];
+//    fvc.indexPhotoDictionary = oldDic;
+//    [fvc setIndexPhotoDictionaryBlock:^(NSMutableDictionary *selectDictionary){
+//        [weakSelf.selectImageDictionary setObject:selectDictionary forKey:_titleLabel.text];
+//        [_titleTabelView reloadData];
+//    }];
     
     fvc.albumImageUrlArray = weakSelf.imageAssetAray;
     fvc.currentIndex = index;
@@ -380,12 +380,14 @@
     cell.photoTextLabel.text = [NSString stringWithFormat:@"%@（%ld）",assetCollection.localizedTitle,(long)assets.count];
     
     //是否显示数字
-    if ([[_selectImageDictionary objectForKey:assetCollection.localizedTitle] allKeys].count == 0) {
-        cell.photoSelectNum.hidden = YES;
-    } else {
-        cell.photoSelectNum.hidden = NO;
-        cell.photoSelectNum.text = [NSString stringWithFormat:@"%li",[[_selectImageDictionary objectForKey:assetCollection.localizedTitle] allKeys].count];
-    }
+    cell.photoSelectNum.hidden = YES;
+
+//    if ([[_selectImageDictionary objectForKey:assetCollection.localizedTitle] allKeys].count == 0) {
+//        cell.photoSelectNum.hidden = YES;
+//    } else {
+//        cell.photoSelectNum.hidden = NO;
+//        cell.photoSelectNum.text = [NSString stringWithFormat:@"%li",[[_selectImageDictionary objectForKey:assetCollection.localizedTitle] allKeys].count];
+//    }
     
     return cell;
 }
@@ -463,9 +465,9 @@
             btn.selected = YES;
             [_onlySelectDictionary setObject:asset forKey:asset];
             
-            NSMutableDictionary *newDic= [_selectImageDictionary objectForKey:_titleLabel.text];
-            [newDic setObject:asset forKey:asset];
-            [_selectImageDictionary setObject:newDic forKey:_titleLabel.text];
+//            NSMutableDictionary *newDic= [_selectImageDictionary objectForKey:_titleLabel.text];
+//            [newDic setObject:asset forKey:asset];
+//            [_selectImageDictionary setObject:newDic forKey:_titleLabel.text];
         }
     }
     else
@@ -473,9 +475,9 @@
         btn.selected = NO;
         [_onlySelectDictionary removeObjectForKey:asset];
         
-        NSMutableDictionary *oldDic = [_selectImageDictionary objectForKey:_titleLabel.text];
-        [oldDic removeObjectForKey:asset];
-        [_selectImageDictionary setObject:oldDic forKey:_titleLabel.text];
+//        NSMutableDictionary *oldDic = [_selectImageDictionary objectForKey:_titleLabel.text];
+//        [oldDic removeObjectForKey:asset];
+//        [_selectImageDictionary setObject:oldDic forKey:_titleLabel.text];
     }
     
     if ([_onlySelectDictionary allKeys].count == 0)
@@ -536,8 +538,7 @@
 - (IBAction)okBtnClick:(UIButton *)sender
 {
     NSLog(@"下一步");
-   
-    NSLog(@"%@",_selectImageDictionary);
+//    NSLog(@"%@",_selectImageDictionary);
 }
 
 #pragma mark--UIImagePickerControllerDelegate

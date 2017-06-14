@@ -11,7 +11,7 @@
 @interface FLImageShowVC : UIViewController
 
 @property (nonatomic, copy) void(^onlySelectDictionaryBlock)(NSMutableDictionary *selectDictionary);
-@property (nonatomic, copy) void(^indexPhotoDictionaryBlock)(NSMutableDictionary *selectDictionary);
+//@property (nonatomic, copy) void(^indexPhotoDictionaryBlock)(NSMutableDictionary *selectDictionary);
 
 /**
  *  本地图片名字数组
@@ -31,5 +31,5 @@
 @property (nonatomic,assign)NSInteger currentIndex;
 
 @property (nonatomic,strong)NSMutableDictionary *onlySelectDictionary;//只能选择9张照片的字典
-@property (nonatomic,strong)NSMutableDictionary *indexPhotoDictionary;//当前相册下剩余的图片
+//@property (nonatomic,strong)NSMutableDictionary *indexPhotoDictionary;//当前相册下剩余的图片
 @end

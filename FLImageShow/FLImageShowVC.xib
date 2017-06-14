@@ -61,7 +61,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <state key="normal" image="ico_未选中.png"/>
                             <connections>
-                                <action selector="selectImageAction:" destination="-1" eventType="touchUpInside" id="lkL-ps-WrA"/>
+                                <action selector="selectImageAction:" destination="-1" eventType="touchDown" id="ey7-Lq-Cls"/>
                             </connections>
                         </button>
                     </subviews>
