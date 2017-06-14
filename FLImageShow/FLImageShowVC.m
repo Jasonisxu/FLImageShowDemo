@@ -50,7 +50,7 @@ typedef enum : NSUInteger {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getNotWithIentationChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
     
     //ui设置
-    _topView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.3];
+    _topView.backgroundColor = [UIColor whiteColor];
     
     //根据数组得出图片类型
     if (_localImageNamesArray.count > 0)
@@ -85,9 +85,9 @@ typedef enum : NSUInteger {
     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
     layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     layout.itemSize = CGSizeMake(screenWidth, screenheight);
-    layout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 10);
+    layout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0);
     layout.minimumInteritemSpacing = 0;
-    layout.minimumLineSpacing = 10;
+    layout.minimumLineSpacing = 0;
     _myCollectionView.collectionViewLayout = layout;
     
     _myCollectionView.showsVerticalScrollIndicator = NO;
@@ -143,9 +143,9 @@ typedef enum : NSUInteger {
             UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
             layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
             layout.itemSize = CGSizeMake(mainScreenWidth, mainScreenHeight);
-            layout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 10);
+            layout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0);
             layout.minimumInteritemSpacing = 0;
-            layout.minimumLineSpacing = 10;
+            layout.minimumLineSpacing = 0;
             _myCollectionView.collectionViewLayout = layout;
             break;
         }
@@ -211,10 +211,10 @@ typedef enum : NSUInteger {
 {
     [self rotateView];
 }
-#pragma mark--点击
+#pragma mark--点击--
 - (void)singleViewTapAction
 {
-    _topView.hidden = !_topView.hidden;
+//    _topView.hidden = !_topView.hidden;
 }
 - (void)doubleViewTapAction:(UITapGestureRecognizer *)tap
 {
