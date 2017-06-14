@@ -15,7 +15,6 @@
 @property (nonatomic,strong)NSMutableDictionary *onlySelectDictionary;//只能选择9张照片的字典
 
 @property (nonatomic,strong)NSMutableArray *imageUrlArray;
-@property (nonatomic,strong)NSMutableArray *selectIndexArray;
 @property (nonatomic,assign)BOOL isNotShowSelectBtn;
 @property (weak, nonatomic) IBOutlet UIView *bottomView;
 

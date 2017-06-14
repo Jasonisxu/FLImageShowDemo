@@ -15,8 +15,6 @@
 		96594FAC1EEFCE1B00267D6D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 96594FAA1EEFCE1B00267D6D /* LaunchScreen.storyboard */; };
 		96594FC41EEFCF5900267D6D /* ImagePickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96594FB51EEFCF5900267D6D /* ImagePickerViewController.m */; };
 		96594FC51EEFCF5900267D6D /* ImagePickerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96594FB61EEFCF5900267D6D /* ImagePickerViewController.xib */; };
-		96594FC61EEFCF5900267D6D /* bg_底部@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96594FB81EEFCF5900267D6D /* bg_底部@2x.png */; };
-		96594FC71EEFCF5900267D6D /* btn_确定@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96594FB91EEFCF5900267D6D /* btn_确定@2x.png */; };
 		96594FC81EEFCF5900267D6D /* ico_arrow_left@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96594FBA1EEFCF5900267D6D /* ico_arrow_left@2x.png */; };
 		96594FC91EEFCF5900267D6D /* ico_向上箭头@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96594FBB1EEFCF5900267D6D /* ico_向上箭头@2x.png */; };
 		96594FCA1EEFCF5900267D6D /* ico_向下箭头@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96594FBC1EEFCF5900267D6D /* ico_向下箭头@2x.png */; };
@@ -65,8 +63,6 @@
 		96594FB41EEFCF5900267D6D /* ImagePickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerViewController.h; sourceTree = "<group>"; };
 		96594FB51EEFCF5900267D6D /* ImagePickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImagePickerViewController.m; sourceTree = "<group>"; };
 		96594FB61EEFCF5900267D6D /* ImagePickerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ImagePickerViewController.xib; sourceTree = "<group>"; };
-		96594FB81EEFCF5900267D6D /* bg_底部@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bg_底部@2x.png"; sourceTree = "<group>"; };
-		96594FB91EEFCF5900267D6D /* btn_确定@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "btn_确定@2x.png"; sourceTree = "<group>"; };
 		96594FBA1EEFCF5900267D6D /* ico_arrow_left@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ico_arrow_left@2x.png"; sourceTree = "<group>"; };
 		96594FBB1EEFCF5900267D6D /* ico_向上箭头@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ico_向上箭头@2x.png"; sourceTree = "<group>"; };
 		96594FBC1EEFCF5900267D6D /* ico_向下箭头@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ico_向下箭头@2x.png"; sourceTree = "<group>"; };
@@ -192,8 +188,6 @@
 		96594FB71EEFCF5900267D6D /* resource */ = {
 			isa = PBXGroup;
 			children = (
-				96594FB81EEFCF5900267D6D /* bg_底部@2x.png */,
-				96594FB91EEFCF5900267D6D /* btn_确定@2x.png */,
 				96594FBA1EEFCF5900267D6D /* ico_arrow_left@2x.png */,
 				96594FBB1EEFCF5900267D6D /* ico_向上箭头@2x.png */,
 				96594FBC1EEFCF5900267D6D /* ico_向下箭头@2x.png */,
@@ -340,14 +334,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96594FC61EEFCF5900267D6D /* bg_底部@2x.png in Resources */,
 				96594FC81EEFCF5900267D6D /* ico_arrow_left@2x.png in Resources */,
 				96594FDF1EEFCFA500267D6D /* FLImageShowVC.xib in Resources */,
 				96594FCD1EEFCF5900267D6D /* ico_选中@2x.png in Resources */,
 				96594FE01EEFCFA500267D6D /* flImageShow_arrow_left@2x.png in Resources */,
 				96594FCA1EEFCF5900267D6D /* ico_向下箭头@2x.png in Resources */,
 				96594FC91EEFCF5900267D6D /* ico_向上箭头@2x.png in Resources */,
-				96594FC71EEFCF5900267D6D /* btn_确定@2x.png in Resources */,
 				96594FCF1EEFCF5900267D6D /* MyCollectionViewCell.xib in Resources */,
 				96594FCC1EEFCF5900267D6D /* ico_相机@2x.png in Resources */,
 				96594FAC1EEFCE1B00267D6D /* LaunchScreen.storyboard in Resources */,
@@ -550,6 +542,7 @@
 				96594FB21EEFCE1B00267D6D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

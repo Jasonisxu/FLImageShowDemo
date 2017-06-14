@@ -66,7 +66,6 @@
     [self.myCollectionView registerNib:[UINib nibWithNibName:@"MyCollectionViewCell" bundle:nil] forCellWithReuseIdentifier:Cellidentifier];
     _imageAssetAray = [NSMutableArray array];
     _imageUrlArray = [NSMutableArray array];
-    _selectIndexArray = [NSMutableArray array];
     _myCollectionView.backgroundColor = [UIColor whiteColor];
     
     
@@ -217,13 +216,8 @@
                 cell.imageView.image = result;
             }];
             
-            for (int i =0; i < _selectIndexArray.count; i++)
-            {
-                NSString *selectIndex = _selectIndexArray[i];
-                if (indexPath.row == [selectIndex integerValue])
-                {
-                    cell.selectBtn.selected = YES;
-                }
+            if ([_onlySelectDictionary objectForKey:asset]) {
+                cell.selectBtn.selected = YES;
             }
             
         }
@@ -241,13 +235,8 @@
             cell.imageView.image = result;
         }];
         
-        for (int i =0; i < _selectIndexArray.count; i++)
-        {
-            NSString *selectIndex = _selectIndexArray[i];
-            if (indexPath.row == [selectIndex integerValue])
-            {
-                cell.selectBtn.selected = YES;
-            }
+        if ([_onlySelectDictionary objectForKey:asset]) {
+            cell.selectBtn.selected = YES;
         }
     }
     
@@ -327,6 +316,20 @@
     _titleTabelView.separatorStyle = UITableViewCellSeparatorStyleNone;
     [self.view addSubview:_titleTableBackgroundView];
     [_titleTableBackgroundView addSubview:_titleTabelView];
+    
+    
+    UIView *buttomView = [[UIView alloc] initWithFrame:CGRectMake(0, _titleTabelView.frame.size.height, SCREENWIDTH, SCREENHEIGHT)];
+    [_titleTableBackgroundView addSubview:buttomView];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hidenTitleTableBackgroundViewAction)];
+    [buttomView addGestureRecognizer:tap];
+}
+
+#pragma mark --隐藏_titleTableBackgroundView--
+- (void)hidenTitleTableBackgroundViewAction {
+    [UIView animateWithDuration:0.5 animations:^{
+        _titleTableBackgroundView.frame  =CGRectMake(0, - SCREENHEIGHT, _titleTableBackgroundView.frame.size.width, _titleTableBackgroundView.frame.size.height);
+        _titleViewImageView.image = [UIImage imageNamed:@"ico_向下箭头"];
+    }];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -356,7 +359,14 @@
     
     cell.photoTextLabel.text = [NSString stringWithFormat:@"%@（%ld）",assetCollection.localizedTitle,(long)assets.count];
     
-    cell.photoSelectNum.text = [NSString stringWithFormat:@"%li",[[_selectImageDictionary objectForKey:assetCollection.localizedTitle] allKeys].count];
+    //是否显示数字
+    if ([[_selectImageDictionary objectForKey:assetCollection.localizedTitle] allKeys].count == 0) {
+        cell.photoSelectNum.hidden = YES;
+    } else {
+        cell.photoSelectNum.hidden = NO;
+        cell.photoSelectNum.text = [NSString stringWithFormat:@"%li",[[_selectImageDictionary objectForKey:assetCollection.localizedTitle] allKeys].count];
+    }
+    
     return cell;
 }
 
@@ -368,8 +378,6 @@
     } else {
         _isCameraRoll = NO;
     }
-    
-    [_selectIndexArray removeAllObjects];
     
     PHAssetCollection *assetCollection = _groupArray[indexPath.row];
     _titleLabel.text =assetCollection.localizedTitle;
@@ -383,11 +391,8 @@
     [_imageAssetAray removeAllObjects];
     [_imageUrlArray removeAllObjects];
     [self getImageWithGroup:assetCollection];
-    [UIView animateWithDuration:0.5 animations:^{
-        
-        _titleTableBackgroundView.frame  =CGRectMake(0, - SCREENHEIGHT, _titleTableBackgroundView.frame.size.width, _titleTableBackgroundView.frame.size.height);
-        _titleViewImageView.image = [UIImage imageNamed:@"ico_向下箭头"];
-    }];
+    
+    [self hidenTitleTableBackgroundViewAction];
 }
 
 //根据相册获取下面的图片
@@ -437,8 +442,6 @@
         } else {
             btn.selected = YES;
             [_onlySelectDictionary setObject:asset forKey:asset];
-            [_selectIndexArray addObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
-            
             
             NSMutableDictionary *newDic= [_selectImageDictionary objectForKey:_titleLabel.text];
             [newDic setObject:asset forKey:asset];
@@ -449,7 +452,6 @@
     {
         btn.selected = NO;
         [_onlySelectDictionary removeObjectForKey:asset];
-        [_selectIndexArray removeObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
         
         NSMutableDictionary *oldDic = [_selectImageDictionary objectForKey:_titleLabel.text];
         [oldDic removeObjectForKey:asset];
