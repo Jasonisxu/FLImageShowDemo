@@ -9,6 +9,7 @@
 #import "FLImageShowCell.h"
 #import "UIImageView+WebCache.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <Photos/Photos.h>
 
 @implementation FLImageShowCell
 
@@ -99,17 +100,16 @@
         }
     }];
 }
-- (void)setAlbumImageUrl:(NSURL *)albumImageUrl
+
+- (void)addAlbumImageUrl:(NSArray *)imageAssetAray index:(NSInteger)index
 {
-    _albumImageUrl = albumImageUrl;
     
-    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-    [library assetForURL:albumImageUrl resultBlock:^(ALAsset *asset) {
-        ALAssetRepresentation *representation = asset.defaultRepresentation;
-        _imageView.image = [UIImage imageWithCGImage:representation.fullScreenImage];
+    PHAsset *asset = imageAssetAray[index];
+    // 从asset中获得图片
+    [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:CGSizeMake(asset.pixelWidth, asset.pixelHeight) contentMode:PHImageContentModeDefault options:nil resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        
+        _imageView.image = result;
         [self updateImageViewFrame:_imageView.image];
-    } failureBlock:^(NSError *error) {
-        NSLog(@"相册url错误");
     }];
 }
 

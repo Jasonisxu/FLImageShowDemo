@@ -9,7 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface PhotoAlbumTableViewCell : UITableViewCell
-@property (nonatomic,weak) IBOutlet UIImageView *imageView;
-@property (nonatomic,weak) IBOutlet UILabel *textLabel;
-
+@property (nonatomic,weak) IBOutlet UIImageView *photoImageView;
+@property (nonatomic,weak) IBOutlet UILabel *photoTextLabel;
 @end

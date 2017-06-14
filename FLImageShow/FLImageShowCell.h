@@ -28,8 +28,10 @@ typedef enum : NSUInteger {
  *  网络图片url
  */
 @property (nonatomic,strong)NSString *netImageUrl;
+
 /**
- *  相册图片url
+ *  获取图片数组和下标
  */
-@property (nonatomic,strong)NSURL *albumImageUrl;
+
+- (void)addAlbumImageUrl:(NSArray *)imageAssetAray index:(NSInteger)index;
 @end

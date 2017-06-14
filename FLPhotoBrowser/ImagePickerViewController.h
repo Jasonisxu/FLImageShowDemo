@@ -7,8 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AssetsLibrary/AssetsLibrary.h>
-
 @protocol ImagePickerViewControllerDelegate;
 
 
@@ -47,7 +45,7 @@
  *  @param index 点击照片所在的位置
  *  @param imageUrlArray 所有照片url
  */
-- (void)imagePickerViewController:(ImagePickerViewController *)ivc everyImageClick:(ALAsset *)asset index:(NSInteger)index imageUrlArray:(NSArray *)imageUrlArray;
+//- (void)imagePickerViewController:(ImagePickerViewController *)ivc everyImageClick:(ALAsset *)asset index:(NSInteger)index imageUrlArray:(NSArray *)imageUrlArray;
 
 /**
  *  点击第一张图片（照相机）的回调

@@ -317,7 +317,7 @@ typedef enum : NSUInteger {
             break;
         case FLImageShowTypeAlbum:
         {
-            cell.albumImageUrl = _albumImageUrlArray[indexPath.row];
+            [cell addAlbumImageUrl:_albumImageUrlArray index:indexPath.row];
         }
             break;
             

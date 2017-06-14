@@ -11,23 +11,26 @@
 #import "FLImageShowVC.h"
 #import "PhotoAlbumTableViewCell.h"
 
-#define Cellidentifier @"cell"
+#import <Photos/Photos.h>
+#import "FLImageShowVC.h"
+
+#define Cellidentifier @"PhotoAlbumTableViewCell"
 #define WIDTH(a) [UIScreen mainScreen].bounds.size.width / 320 * a
 #define SCREENWIDTH [UIScreen mainScreen].bounds.size.width
 #define SCREENHEIGHT [UIScreen mainScreen].bounds.size.height
 
 @interface ImagePickerViewController ()
 {
-    ALAssetsLibrary *_assetsLibrary;
     NSMutableArray *_groupArray;
     UILabel *_titleLabel;
     UITableView *_titleTabelView;
     UIView *_titleTableBackgroundView;
     UIImageView *_titleViewImageView;
     UIView *_titleView;
-    
-}
 
+    //是否是Camera Roll
+    BOOL _isCameraRoll;
+}
 @end
 
 @implementation ImagePickerViewController
@@ -73,9 +76,6 @@
     layout.sectionInset = UIEdgeInsetsMake(WIDTH(1), WIDTH(1), WIDTH(1), WIDTH(1));
     _myCollectionView.collectionViewLayout = layout;
     
-    [self createTitleTableView];
-    [self getAlbumList];
-    
     
     //导航栏自定义
     [self leftBarButtonItem:@"取消" image:nil action:@selector(back)];
@@ -92,83 +92,94 @@
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(titleTapAction:)];
     [_titleView addGestureRecognizer:tap];
     self.navigationItem.titleView = _titleView;
-
+    
+    [self createTitleTableView];
+    [self getAlbumList];
 }
 
 
 //获取相册列表
 - (void)getAlbumList
 {
-    //获取相册列表
-    _assetsLibrary = [[ALAssetsLibrary alloc] init];
     _groupArray = [NSMutableArray array];
-    [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop)
-     {
-         if (group)
-         {
-             [_groupArray addObject:group];
-             [_titleTabelView reloadData];
-             
-             NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
-             _titleLabel.text = groupName;
-             [_titleLabel sizeToFit];
-             _titleLabel.center = CGPointMake(_titleView.frame.size.width / 2, 22);
-             
-             _titleViewImageView.center = CGPointMake(_titleLabel.frame.origin.x + _titleLabel.frame.size.width + _titleViewImageView.frame.size.width / 2 + 5, _titleViewImageView.center.y);
-             
-             
-         }
-         else
-         {
-             ALAssetsGroup *group = [_groupArray lastObject];
-             NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
-             [self getImageWithGroup:group name:groupName];
-         }
-         
-     } failureBlock:^(NSError *error)
-     {
-         NSLog(@"error:%@",error.localizedDescription);
-     }];
+    
+    // 获得所有的自定义相簿
+    PHFetchResult<PHAssetCollection *> *assetCollections = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+    // 遍历所有的自定义相簿
+    for (PHAssetCollection *assetCollection in assetCollections) {
+//        [self enumerateAssetsInAssetCollection:assetCollection original:YES];
+        if (assetCollection)
+        {
+            _titleLabel.text = assetCollection.localizedTitle;
+            [_groupArray insertObject:assetCollection atIndex:0];
+            [_titleTabelView reloadData];
+            
+            [_titleLabel sizeToFit];
+            _titleLabel.center = CGPointMake(_titleView.frame.size.width / 2, 22);
+            
+            _titleViewImageView.center = CGPointMake(_titleLabel.frame.origin.x + _titleLabel.frame.size.width + _titleViewImageView.frame.size.width / 2 + 5, _titleViewImageView.center.y);
+            
+            
+        }
+    }
+    
+    
+    //默认是：相机胶卷
+    _isCameraRoll = YES;
+    // 获得相机胶卷
+    PHAssetCollection *cameraRoll = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary options:nil].lastObject;
+    // 遍历相机胶卷,获取大图
+    [self enumerateAssetsInAssetCollection:cameraRoll original:YES];
 }
 
-//根据相册获取下面的图片
-- (void)getImageWithGroup:(ALAssetsGroup *)group name:(NSString *)name
+/**
+ *  遍历相簿中的所有图片
+ *  @param assetCollection 相簿
+ *  @param original        是否要原图
+ */
+- (void)enumerateAssetsInAssetCollection:(PHAssetCollection *)assetCollection original:(BOOL)original
 {
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        //根据相册获取下面的图片
-        NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
-        if (name && ![name isEqualToString:groupName])
-        {
-            return;
-        }
+    NSLog(@"相簿名:%@", assetCollection.localizedTitle);
+    if (assetCollection)
+    {
+        _titleLabel.text = assetCollection.localizedTitle;
+        [_groupArray insertObject:assetCollection atIndex:0];
+        [_titleTabelView reloadData];
         
-        [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
-            if (result) {
-                
-                [_imageAssetAray insertObject:result atIndex:0];
-                
-                [_thumbnailArray insertObject:[UIImage imageWithCGImage:result.thumbnail] atIndex:0];
-                
-                ALAssetRepresentation *representation = result.defaultRepresentation;
-                [_imageUrlArray insertObject:representation.url atIndex:0];
-                
-            }
-            if (index == group.numberOfAssets - 1)
+        [_titleLabel sizeToFit];
+        _titleLabel.center = CGPointMake(_titleView.frame.size.width / 2, 22);
+        
+        _titleViewImageView.center = CGPointMake(_titleLabel.frame.origin.x + _titleLabel.frame.size.width + _titleViewImageView.frame.size.width / 2 + 5, _titleViewImageView.center.y);
+        
+    }
+    [_imageAssetAray removeAllObjects];
+    
+    // 获得某个相簿中的所有PHAsset对象
+    PHFetchResult<PHAsset *> *assets = [PHAsset fetchAssetsInAssetCollection:assetCollection options:nil];
+    
+    if (assets.count == 0) {
+        [_myCollectionView reloadData];
+    }else {
+        for (PHAsset *asset in assets) {
+            
+            [_imageAssetAray insertObject:asset atIndex:0];
+            
+            if ([assets.lastObject isEqual:asset])
             {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [_myCollectionView reloadData];
-                });
+                [_myCollectionView reloadData];
             }
-        }];
-    });
-    
-    
+        }
+    }
 }
 
 #pragma mark--UICollectionViewDataSource,UICollectionViewDelegate
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return _imageAssetAray.count + 1;
+    if (_isCameraRoll) {
+        return _imageAssetAray.count + 1;
+    } else {
+        return _imageAssetAray.count;
+    }
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -188,11 +199,42 @@
         [cell.selectBtn addTarget:self action:@selector(selectBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     
-    if (indexPath.row !=0)
-    {
-        ALAsset *asset = _imageAssetAray[indexPath.row - 1];
-        UIImage *image = [UIImage imageWithCGImage:asset.thumbnail];
-        cell.imageView.image = image;
+    
+    if (_isCameraRoll) {
+        if (indexPath.row !=0)
+        {
+            
+            PHAsset *asset = _imageAssetAray[indexPath.row - 1];
+            
+            // 从asset中获得图片
+            [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeDefault options:nil resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+                
+                cell.imageView.image = result;
+            }];
+            
+            for (int i =0; i < _selectIndexArray.count; i++)
+            {
+                NSString *selectIndex = _selectIndexArray[i];
+                if (indexPath.row == [selectIndex integerValue])
+                {
+                    cell.selectBtn.selected = YES;
+                }
+            }
+            
+        }
+        else
+        {
+            cell.imageView.image = [UIImage imageNamed:@"ico_相机"];
+            cell.selectBtn.hidden = YES;
+        }
+    } else {
+        PHAsset *asset = _imageAssetAray[indexPath.row];
+        
+        // 从asset中获得图片
+        [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeDefault options:nil resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+            
+            cell.imageView.image = result;
+        }];
         
         for (int i =0; i < _selectIndexArray.count; i++)
         {
@@ -202,43 +244,52 @@
                 cell.selectBtn.selected = YES;
             }
         }
-        
     }
-    else
-    {
-        cell.imageView.image = [UIImage imageNamed:@"ico_相机"];
-        cell.selectBtn.hidden = YES;
-    }
+    
+    
+    
     
     return cell;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row != 0)
-    {
-        ALAsset *asset = _imageAssetAray[indexPath.row - 1];
-        if ([_delegate respondsToSelector:@selector(imagePickerViewController:everyImageClick:index:imageUrlArray:)])
-        {
-            [_delegate imagePickerViewController:self everyImageClick:asset index:indexPath.row - 1 imageUrlArray:_imageUrlArray];
+    if (_isCameraRoll) {
+        if (indexPath.row == 0) {
+            [self callSystemCamera];
+        } else {
+            NSLog(@"点击了%li",indexPath.row);
+
+            FLImageShowVC *fvc = [[FLImageShowVC alloc] init];
+            fvc.albumImageUrlArray = _imageAssetAray;
+            fvc.currentIndex = indexPath.row - 1;
+            [self.navigationController pushViewController:fvc animated:YES];
         }
+    } else {
+        NSLog(@"点击了%li",indexPath.row);
+        FLImageShowVC *fvc = [[FLImageShowVC alloc] init];
+        fvc.albumImageUrlArray = _imageAssetAray;
+        fvc.currentIndex = indexPath.row;
+        [self.navigationController pushViewController:fvc animated:YES];
+    }
+}
+
+#pragma mark --调用系统相机--
+- (void)callSystemCamera {
+    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
+    {
+        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+        imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        imagePicker.delegate = self;
+        imagePicker.allowsEditing = YES;
+        [self presentViewController:imagePicker animated:YES completion:nil];
     }
     else
     {
-        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
-        {
-            UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
-            imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
-            imagePicker.delegate = self;
-            imagePicker.allowsEditing = YES;
-            [self presentViewController:imagePicker animated:YES completion:nil];
-        }
-        else
-        {
-            [[[UIAlertView alloc] initWithTitle:@"亲，您的设备不支持照相机功能" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil] show];
-        }
+        [[[UIAlertView alloc] initWithTitle:@"亲，您的设备不支持照相机功能" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil] show];
     }
 }
+
 
 - (void)titleTapAction:(UITapGestureRecognizer *)tap
 {
@@ -279,7 +330,7 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 50;
+    return 60;
 }
 
 - (PhotoAlbumTableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -290,21 +341,35 @@
         NSArray *array = [[NSBundle mainBundle] loadNibNamed:@"PhotoAlbumTableViewCell" owner:self options:nil];
         cell = [array objectAtIndex:0];
     }
-    ALAssetsGroup *group = _groupArray[_groupArray.count - indexPath.row - 1];
-    cell.textLabel.text = [NSString stringWithFormat:@"%@（%ld）",[group valueForProperty:ALAssetsGroupPropertyName],(long)group.numberOfAssets];
-    cell.imageView.image = [UIImage imageWithCGImage:group.posterImage];
+    PHAssetCollection *assetCollection = _groupArray[indexPath.row];
     
+    PHFetchResult<PHAsset *> *assets = [PHAsset fetchAssetsInAssetCollection:assetCollection options:nil];
+    // 从asset中获得图片
+    [[PHImageManager defaultManager] requestImageForAsset:assets.lastObject targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeDefault options:nil resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        cell.photoImageView.image = result;
+    }];
+    
+    cell.photoTextLabel.text = [NSString stringWithFormat:@"%@（%ld）",assetCollection.localizedTitle,(long)assets.count];
     
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    //判断是否点击了相册
+    if (indexPath.row == 0) {
+        _isCameraRoll = YES;
+    } else {
+        _isCameraRoll = NO;
+    }
+    
     [_okBtn setTitle:@"下一步" forState:UIControlStateNormal];
     [_selectAssetArray removeAllObjects];
     [_selectIndexArray removeAllObjects];
-    ALAssetsGroup *group = _groupArray[_groupArray.count - indexPath.row - 1];
-    _titleLabel.text = [group valueForProperty:ALAssetsGroupPropertyName];
+    
+    PHAssetCollection *assetCollection = _groupArray[indexPath.row];
+    _titleLabel.text =assetCollection.localizedTitle;
+    
     
     [_titleLabel sizeToFit];
     _titleLabel.center = CGPointMake(_titleView.frame.size.width / 2, 22);
@@ -313,7 +378,7 @@
     
     [_imageAssetAray removeAllObjects];
     [_imageUrlArray removeAllObjects];
-    [self getImageWithGroup:group name:_titleLabel.text];
+    [self getImageWithGroup:assetCollection];
     [UIView animateWithDuration:0.5 animations:^{
         
         _titleTableBackgroundView.frame  =CGRectMake(0, - SCREENHEIGHT, _titleTableBackgroundView.frame.size.width, _titleTableBackgroundView.frame.size.height);
@@ -321,36 +386,59 @@
     }];
 }
 
+//根据相册获取下面的图片
+- (void)getImageWithGroup:(PHAssetCollection *)assetCollection
+{
+    // 获得某个相簿中的所有PHAsset对象
+    PHFetchResult<PHAsset *> *assets = [PHAsset fetchAssetsInAssetCollection:assetCollection options:nil];
+    if (assets.count == 0) {
+        [_myCollectionView reloadData];
+    }else {
+        for (PHAsset *asset in assets) {
+            
+            [_imageAssetAray insertObject:asset atIndex:0];
+            
+            if ([assets.lastObject isEqual:asset])
+            {
+                [_myCollectionView reloadData];
+            }
+        }
+    }
+    
+    
+}
+
+
 
 - (void)selectBtnClick:(UIButton *)btn
 {
-    btn.selected = !btn.selected;
-    MyCollectionViewCell *cell = (MyCollectionViewCell *)[[btn superview] superview];
-    NSIndexPath *indexPath = [_myCollectionView indexPathForCell:cell];
-    ALAsset *asset = _imageAssetAray[indexPath.row - 1];
-    
-    if (btn.selected)
-    {
-        [_selectAssetArray addObject:asset];
-        [_selectIndexArray addObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
-    }
-    else
-    {
-        [_selectAssetArray removeObject:asset];
-        [_selectIndexArray removeObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
-    }
-    
-    if (_selectAssetArray.count == 0)
-    {
-        [_okBtn setTitle:@"下一步" forState:UIControlStateNormal];
-    }
-    else
-    {
-        [_okBtn setTitle:[NSString stringWithFormat:@"下一步(%lu)",(unsigned long)[_selectAssetArray count]] forState:UIControlStateNormal];
-    }
-    NSLog(@"%@",_selectIndexArray);
-    NSLog(@"%@",_selectAssetArray);
-    
+    //    btn.selected = !btn.selected;
+    //    MyCollectionViewCell *cell = (MyCollectionViewCell *)[[btn superview] superview];
+    //    NSIndexPath *indexPath = [_myCollectionView indexPathForCell:cell];
+    //    ALAsset *asset = _imageAssetAray[indexPath.row - 1];
+    //
+    //    if (btn.selected)
+    //    {
+    //        [_selectAssetArray addObject:asset];
+    //        [_selectIndexArray addObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
+    //    }
+    //    else
+    //    {
+    //        [_selectAssetArray removeObject:asset];
+    //        [_selectIndexArray removeObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
+    //    }
+    //
+    //    if (_selectAssetArray.count == 0)
+    //    {
+    //        [_okBtn setTitle:@"下一步" forState:UIControlStateNormal];
+    //    }
+    //    else
+    //    {
+    //        [_okBtn setTitle:[NSString stringWithFormat:@"下一步(%lu)",(unsigned long)[_selectAssetArray count]] forState:UIControlStateNormal];
+    //    }
+    //    NSLog(@"%@",_selectIndexArray);
+    //    NSLog(@"%@",_selectAssetArray);
+    //
 }
 
 
@@ -414,11 +502,11 @@
     [self dismissViewControllerAnimated:YES completion:^{
         
         NSLog(@"----调用相机拍出的图片:%@",image);
-
-//        if ([_delegate respondsToSelector:@selector(imagePickerViewController:firstImageClick:)])
-//        {
-//            [_delegate imagePickerViewController:self firstImageClick:image];
-//        }
+        
+        //        if ([_delegate respondsToSelector:@selector(imagePickerViewController:firstImageClick:)])
+        //        {
+        //            [_delegate imagePickerViewController:self firstImageClick:image];
+        //        }
     }];
     
 }
