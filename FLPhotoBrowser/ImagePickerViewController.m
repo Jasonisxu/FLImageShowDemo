@@ -267,15 +267,24 @@
     __weak __typeof(&*self)weakSelf = self;
     
     FLImageShowVC *fvc = [[FLImageShowVC alloc] init];
-    fvc.onlySelectDictionary = weakSelf.onlySelectDictionary;
-    fvc.albumImageUrlArray = weakSelf.imageAssetAray;
-    fvc.currentIndex = index;
     
+    fvc.onlySelectDictionary = weakSelf.onlySelectDictionary;
     [fvc setOnlySelectDictionaryBlock:^(NSMutableDictionary *selectDictionary){
         [weakSelf.okBtn setTitle:[NSString stringWithFormat:@"下一步(%lu)",(unsigned long)[[_onlySelectDictionary allKeys] count]] forState:UIControlStateNormal];
         weakSelf.onlySelectDictionary = selectDictionary;
         [weakSelf.myCollectionView reloadData];
     }];
+    
+    NSMutableDictionary *oldDic = [_selectImageDictionary objectForKey:_titleLabel.text];
+    fvc.indexPhotoDictionary = oldDic;
+    [fvc setIndexPhotoDictionaryBlock:^(NSMutableDictionary *selectDictionary){
+        [weakSelf.selectImageDictionary setObject:selectDictionary forKey:_titleLabel.text];
+        [_titleTabelView reloadData];
+    }];
+    
+    fvc.albumImageUrlArray = weakSelf.imageAssetAray;
+    fvc.currentIndex = index;
+    
     [weakSelf.navigationController pushViewController:fvc animated:YES];
 }
 

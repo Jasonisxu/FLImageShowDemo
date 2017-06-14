@@ -240,6 +240,10 @@ typedef enum : NSUInteger {
     if (self.onlySelectDictionaryBlock) {
         self.onlySelectDictionaryBlock(_onlySelectDictionary);
     }
+    
+    if (self.indexPhotoDictionaryBlock) {
+        self.indexPhotoDictionaryBlock(_indexPhotoDictionary);
+    }
 
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -365,12 +369,14 @@ typedef enum : NSUInteger {
             [[[UIAlertView alloc] initWithTitle:@"亲，最多只能选择9张" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil] show];
         } else {
             [_onlySelectDictionary setObject:asset forKey:asset];
+            [_indexPhotoDictionary setObject:asset forKey:asset];
             
             self.selectButton.tag = 1;
             [self.selectButton setImage:[UIImage imageNamed:@"ico_选中.png"] forState:UIControlStateNormal];
         }
     } else {
         [_onlySelectDictionary removeObjectForKey:asset];
+        [_indexPhotoDictionary removeObjectForKey:asset];
 
         self.selectButton.tag = 0;
         [self.selectButton setImage:[UIImage imageNamed:@"ico_未选中.png"] forState:UIControlStateNormal];
