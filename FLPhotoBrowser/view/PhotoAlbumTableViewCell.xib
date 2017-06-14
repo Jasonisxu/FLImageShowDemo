@@ -33,6 +33,14 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s7z-e3-3BD">
+                        <rect key="frame" x="46" y="5" width="21" height="21"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" red="0.81960784310000001" green="0.0" blue="0.074509803920000006" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
                 <constraints>
                     <constraint firstItem="dpd-Rx-i3C" firstAttribute="leading" secondItem="wZb-g5-SVU" secondAttribute="trailing" constant="10" id="E5w-9o-eV0"/>
@@ -45,6 +53,7 @@
             </tableViewCellContentView>
             <connections>
                 <outlet property="photoImageView" destination="wZb-g5-SVU" id="cmg-pN-Mfu"/>
+                <outlet property="photoSelectNum" destination="s7z-e3-3BD" id="DBC-ZT-cw2"/>
                 <outlet property="photoTextLabel" destination="dpd-Rx-i3C" id="hki-Je-TZz"/>
             </connections>
         </tableViewCell>

@@ -21,7 +21,7 @@
 
 @interface ImagePickerViewController ()
 {
-    NSMutableArray *_groupArray;
+    NSMutableArray *_groupArray;  //相册数组
     UILabel *_titleLabel;
     UITableView *_titleTabelView;
     UIView *_titleTableBackgroundView;
@@ -54,12 +54,14 @@
     _okBtn.frame = CGRectMake(0, 0, 70, 30);
     [_okBtn setTitle:@"下一步" forState:UIControlStateNormal];
     _okBtn.titleLabel.font = [UIFont systemFontOfSize:12];
+    [_okBtn addTarget:self action:@selector(okBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_okBtn];
     self.navigationItem.rightBarButtonItem = rightBarButtonItem;
     _okBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     
-    _selectAssetArray = [NSMutableArray array];
-    _thumbnailArray = [NSMutableArray array];
+    _selectImageDictionary = [NSMutableDictionary dictionary];
+    _onlySelectDictionary = [NSMutableDictionary dictionary];
+    
     
     [self.myCollectionView registerNib:[UINib nibWithNibName:@"MyCollectionViewCell" bundle:nil] forCellWithReuseIdentifier:Cellidentifier];
     _imageAssetAray = [NSMutableArray array];
@@ -107,9 +109,10 @@
     PHFetchResult<PHAssetCollection *> *assetCollections = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
     // 遍历所有的自定义相簿
     for (PHAssetCollection *assetCollection in assetCollections) {
-        //        [self enumerateAssetsInAssetCollection:assetCollection original:YES];
         if (assetCollection)
         {
+            [_selectImageDictionary setObject:[NSMutableDictionary dictionary] forKey:assetCollection.localizedTitle];
+            
             _titleLabel.text = assetCollection.localizedTitle;
             [_groupArray insertObject:assetCollection atIndex:0];
             [_titleTabelView reloadData];
@@ -142,6 +145,8 @@
     NSLog(@"相簿名:%@", assetCollection.localizedTitle);
     if (assetCollection)
     {
+        [_selectImageDictionary setObject:[NSMutableDictionary dictionary] forKey:assetCollection.localizedTitle];
+
         _titleLabel.text = assetCollection.localizedTitle;
         [_groupArray insertObject:assetCollection atIndex:0];
         [_titleTabelView reloadData];
@@ -351,6 +356,7 @@
     
     cell.photoTextLabel.text = [NSString stringWithFormat:@"%@（%ld）",assetCollection.localizedTitle,(long)assets.count];
     
+    cell.photoSelectNum.text = [NSString stringWithFormat:@"%li",[[_selectImageDictionary objectForKey:assetCollection.localizedTitle] allKeys].count];
     return cell;
 }
 
@@ -363,8 +369,6 @@
         _isCameraRoll = NO;
     }
     
-    [_okBtn setTitle:@"下一步" forState:UIControlStateNormal];
-    [_selectAssetArray removeAllObjects];
     [_selectIndexArray removeAllObjects];
     
     PHAssetCollection *assetCollection = _groupArray[indexPath.row];
@@ -412,6 +416,9 @@
 
 - (void)selectBtnClick:(UIButton *)btn
 {
+    //刷新选择中的数字
+    [_titleTabelView reloadData];
+    
     MyCollectionViewCell *cell = (MyCollectionViewCell *)[[btn superview] superview];
     NSIndexPath *indexPath = [_myCollectionView indexPathForCell:cell];
     PHAsset *asset ;
@@ -424,32 +431,39 @@
     //判断是否选中
     if (!btn.selected)
     {
-        if (_selectAssetArray.count >= 9) {
+        if ([_onlySelectDictionary allKeys].count >= 9) {
             [[[UIAlertView alloc] initWithTitle:@"亲，最多只能选择9张" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil] show];
             return;
         } else {
             btn.selected = YES;
-            [_selectAssetArray addObject:asset];
+            [_onlySelectDictionary setObject:asset forKey:asset];
             [_selectIndexArray addObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
+            
+            
+            NSMutableDictionary *newDic= [_selectImageDictionary objectForKey:_titleLabel.text];
+            [newDic setObject:asset forKey:asset];
+            [_selectImageDictionary setObject:newDic forKey:_titleLabel.text];
         }
     }
     else
     {
         btn.selected = NO;
-        [_selectAssetArray removeObject:asset];
+        [_onlySelectDictionary removeObjectForKey:asset];
         [_selectIndexArray removeObject:[NSString stringWithFormat:@"%ld",(long)btn.tag]];
+        
+        NSMutableDictionary *oldDic = [_selectImageDictionary objectForKey:_titleLabel.text];
+        [oldDic removeObjectForKey:asset];
+        [_selectImageDictionary setObject:oldDic forKey:_titleLabel.text];
     }
     
-    if (_selectAssetArray.count == 0)
+    if ([_onlySelectDictionary allKeys].count == 0)
     {
         [_okBtn setTitle:@"下一步" forState:UIControlStateNormal];
     }
     else
     {
-        [_okBtn setTitle:[NSString stringWithFormat:@"下一步(%lu)",(unsigned long)[_selectAssetArray count]] forState:UIControlStateNormal];
+        [_okBtn setTitle:[NSString stringWithFormat:@"下一步(%lu)",(unsigned long)[[_onlySelectDictionary allKeys] count]] forState:UIControlStateNormal];
     }
-    NSLog(@"%@",_selectIndexArray);
-    NSLog(@"%@",_selectAssetArray);
 }
 
 
@@ -500,11 +514,8 @@
 - (IBAction)okBtnClick:(UIButton *)sender
 {
     NSLog(@"下一步");
-    if ([_delegate respondsToSelector:@selector(imagePickerViewController:finishClick:)])
-    {
-        [_delegate imagePickerViewController:self finishClick:_selectAssetArray];
-    }
-    
+   
+    NSLog(@"%@",_selectImageDictionary);
 }
 
 #pragma mark--UIImagePickerControllerDelegate
@@ -513,11 +524,7 @@
     [self dismissViewControllerAnimated:YES completion:^{
         
         NSLog(@"----调用相机拍出的图片:%@",image);
-        
-        //        if ([_delegate respondsToSelector:@selector(imagePickerViewController:firstImageClick:)])
-        //        {
-        //            [_delegate imagePickerViewController:self firstImageClick:image];
-        //        }
+       
     }];
     
 }

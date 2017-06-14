@@ -10,5 +10,6 @@
 
 @interface PhotoAlbumTableViewCell : UITableViewCell
 @property (nonatomic,weak) IBOutlet UIImageView *photoImageView;
+@property (nonatomic,weak) IBOutlet UILabel *photoSelectNum;
 @property (nonatomic,weak) IBOutlet UILabel *photoTextLabel;
 @end
