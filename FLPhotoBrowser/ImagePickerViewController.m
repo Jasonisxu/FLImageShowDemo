@@ -11,7 +11,6 @@
 #import "FLImageShowVC.h"
 #import "PhotoAlbumTableViewCell.h"
 
-#import <Photos/Photos.h>
 #import "FLImageShowVC.h"
 
 #define Cellidentifier @"PhotoAlbumTableViewCell"
@@ -19,7 +18,7 @@
 #define SCREENWIDTH [UIScreen mainScreen].bounds.size.width
 #define SCREENHEIGHT [UIScreen mainScreen].bounds.size.height
 
-@interface ImagePickerViewController ()
+@interface ImagePickerViewController ()<UICollectionViewDelegate, UICollectionViewDataSource>
 {
     NSMutableArray *_groupArray;  //相册数组
     UILabel *_titleLabel;
@@ -63,20 +62,35 @@
     _onlySelectDictionary = [NSMutableDictionary dictionary];
     
     
-    [self.myCollectionView registerNib:[UINib nibWithNibName:@"MyCollectionViewCell" bundle:nil] forCellWithReuseIdentifier:Cellidentifier];
     _imageAssetAray = [NSMutableArray array];
     _imageUrlArray = [NSMutableArray array];
-    _myCollectionView.backgroundColor = [UIColor whiteColor];
+    
+    /**
+     *http://www.cnblogs.com/leo-92/p/4311379.html
+     *iOS UICollectionView 缝隙修复
+     */
+    
+    
     
     
     
     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-    layout.itemSize = CGSizeMake(WIDTH(70), WIDTH(70));
+    layout.itemSize = CGSizeMake(WIDTH(79), WIDTH(79));
     layout.minimumLineSpacing = WIDTH(1);
+    layout.minimumInteritemSpacing = WIDTH(1);
     layout.scrollDirection = UICollectionViewScrollDirectionVertical;
-    layout.sectionInset = UIEdgeInsetsMake(WIDTH(1), WIDTH(1), WIDTH(1), WIDTH(1));
-    _myCollectionView.collectionViewLayout = layout;
+    layout.sectionInset = UIEdgeInsetsMake(WIDTH(0), WIDTH(0), WIDTH(0), WIDTH(0));
     
+    double offsetWidth = (NSUInteger)SCREENWIDTH % 5;
+    CGFloat pointX = offsetWidth == 0 ? 0 : (4- offsetWidth)/2;
+    _myCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(-pointX, 0, SCREENWIDTH + pointX * 2 , SCREENHEIGHT) collectionViewLayout:layout];
+    _myCollectionView.delegate = self;
+    _myCollectionView.dataSource = self;
+    [self.view addSubview:_myCollectionView];
+    _myCollectionView.backgroundColor = [UIColor whiteColor];
+    
+    [self.myCollectionView registerNib:[UINib nibWithNibName:@"MyCollectionViewCell" bundle:nil] forCellWithReuseIdentifier:Cellidentifier];
+
     
     //导航栏自定义
     [self leftBarButtonItem:@"取消" image:nil action:@selector(back)];
@@ -547,8 +561,139 @@
     [self dismissViewControllerAnimated:YES completion:^{
         
         NSLog(@"----调用相机拍出的图片:%@",image);
-       
+        _pickingImage = image;
+        [self savePickingImage];
     }];
     
+}
+
+
+#pragma mark --app自定义相册--创建相簿，存储图片到手机--
+//http://www.cnblogs.com/CoderAlex/p/6343880.html
+
+
+/**
+ *  获得刚才添加到【相机胶卷】中的图片
+ */
+- (PHFetchResult<PHAsset *> *)createdAssets
+{
+    __block NSString *createdAssetId = nil;
+    
+    // 添加图片到【相机胶卷】
+    [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+        createdAssetId = [PHAssetChangeRequest creationRequestForAssetFromImage:_pickingImage].placeholderForCreatedAsset.localIdentifier;
+    } error:nil];
+    
+    if (createdAssetId == nil) return nil;
+    
+    // 在保存完毕后取出图片
+    return [PHAsset fetchAssetsWithLocalIdentifiers:@[createdAssetId] options:nil];
+}
+
+/**
+ *  获得【自定义相册】
+ */
+- (PHAssetCollection *)createdCollection
+{
+    // 获取软件的名字作为相册的标题
+    NSString *title = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];
+    
+    // 获得所有的自定义相册
+    PHFetchResult<PHAssetCollection *> *collections = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+    for (PHAssetCollection *collection in collections) {
+        if ([collection.localizedTitle isEqualToString:title]) {
+            return collection;
+        }
+    }
+    
+    // 代码执行到这里，说明还没有自定义相册
+    
+    __block NSString *createdCollectionId = nil;
+    
+    // 创建一个新的相册
+    [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+        createdCollectionId = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:title].placeholderForCreatedAssetCollection.localIdentifier;
+    } error:nil];
+    
+    if (createdCollectionId == nil) return nil;
+    
+    // 创建完毕后再取出相册
+    return [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[createdCollectionId] options:nil].firstObject;
+}
+
+/**
+ *  保存图片到相册
+ */
+- (void)saveImageIntoAlbum
+{
+    // 获得相片
+    PHFetchResult<PHAsset *> *createdAssets = self.createdAssets;
+    
+    // 获得相册
+    PHAssetCollection *createdCollection = self.createdCollection;
+    
+    if (createdAssets == nil || createdCollection == nil) {
+//        [SVProgressHUD showErrorWithStatus:@"保存失败！"];
+        return;
+    }
+    
+    // 将相片添加到相册
+    NSError *error = nil;
+    [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+        PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:createdCollection];
+        [request insertAssets:createdAssets atIndexes:[NSIndexSet indexSetWithIndex:0]];
+    } error:&error];
+    
+    // 保存结果
+    if (error) {
+//        [SVProgressHUD showErrorWithStatus:@"保存失败！"];
+    } else {
+//        [SVProgressHUD showSuccessWithStatus:@"保存成功！"];
+        
+        //选中添加的照片
+        for (PHAsset *asset in createdAssets) {
+            [_onlySelectDictionary setObject:asset forKey:asset];
+        }
+        [self getAlbumList];
+    }
+}
+
+- (void)savePickingImage{
+    /*
+     requestAuthorization方法的功能
+     1.如果用户还没有做过选择，这个方法就会弹框让用户做出选择
+     1> 用户做出选择以后才会回调block
+     
+     2.如果用户之前已经做过选择，这个方法就不会再弹框，直接回调block，传递现在的授权状态给block
+     */
+    
+    PHAuthorizationStatus oldStatus = [PHPhotoLibrary authorizationStatus];
+    
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            switch (status) {
+                case PHAuthorizationStatusAuthorized: {
+                    //  保存图片到相册
+                    [self saveImageIntoAlbum];
+                    break;
+                }
+                    
+                case PHAuthorizationStatusDenied: {
+                    if (oldStatus == PHAuthorizationStatusNotDetermined) return;
+                    
+//                    JHLog(@"提醒用户打开相册的访问开关")
+                    break;
+                }
+                    
+                case PHAuthorizationStatusRestricted: {
+//                    [SVProgressHUD showErrorWithStatus:@"因系统原因，无法访问相册！"];
+                    break;
+                }
+                    
+                default:
+                    break;
+            }
+        });
+    }];
 }
 @end

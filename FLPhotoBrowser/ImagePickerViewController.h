@@ -7,8 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <Photos/Photos.h>
+
 @interface ImagePickerViewController : UIViewController<UICollectionViewDataSource,UICollectionViewDelegate,UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
-@property (weak, nonatomic) IBOutlet UICollectionView *myCollectionView;
+@property (strong, nonatomic)  UICollectionView *myCollectionView;
+@property (strong, nonatomic) UIImage *pickingImage;
 
 @property (nonatomic,strong)NSMutableArray *imageAssetAray; //照片分类数组
 //@property (nonatomic,strong)NSMutableDictionary *selectImageDictionary;//选中照片库中，照片的个数
@@ -21,5 +24,9 @@
 @property (strong , nonatomic) UIButton *okBtn;
 
 - (IBAction)okBtnClick:(UIButton *)sender;
+
+// 在interface中写方法的声明，是为了点语法有智能提示
+- (PHFetchResult<PHAsset *> *)createdAssets;
+- (PHAssetCollection *)createdCollection;
 
 @end
